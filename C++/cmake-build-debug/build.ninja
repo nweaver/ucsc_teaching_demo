@@ -51,13 +51,13 @@ build cmake_object_order_depends_target_C__: phony || CMakeFiles/C__.dir
 
 build CMakeFiles/C__.dir/main.cpp.o: CXX_COMPILER__C___unscanned_Debug /Users/nweaver/archive/ucsc_teaching_demo/C++/main.cpp || cmake_object_order_depends_target_C__
   DEP_FILE = CMakeFiles/C__.dir/main.cpp.o.d
-  FLAGS = -g -std=gnu++17 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk -fcolor-diagnostics
+  FLAGS = -Wall -Wextra -g -std=gnu++20 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk -fcolor-diagnostics
   OBJECT_DIR = CMakeFiles/C__.dir
   OBJECT_FILE_DIR = CMakeFiles/C__.dir
 
 build CMakeFiles/C__.dir/Graph.cpp.o: CXX_COMPILER__C___unscanned_Debug /Users/nweaver/archive/ucsc_teaching_demo/C++/Graph.cpp || cmake_object_order_depends_target_C__
   DEP_FILE = CMakeFiles/C__.dir/Graph.cpp.o.d
-  FLAGS = -g -std=gnu++17 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk -fcolor-diagnostics
+  FLAGS = -Wall -Wextra -g -std=gnu++20 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk -fcolor-diagnostics
   OBJECT_DIR = CMakeFiles/C__.dir
   OBJECT_FILE_DIR = CMakeFiles/C__.dir
 
@@ -70,7 +70,7 @@ build CMakeFiles/C__.dir/Graph.cpp.o: CXX_COMPILER__C___unscanned_Debug /Users/n
 # Link the executable C__
 
 build C__: CXX_EXECUTABLE_LINKER__C___Debug CMakeFiles/C__.dir/main.cpp.o CMakeFiles/C__.dir/Graph.cpp.o
-  FLAGS = -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk
+  FLAGS = -Wall -Wextra -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk
   OBJECT_DIR = CMakeFiles/C__.dir
   POST_BUILD = :
   PRE_LINK = :
