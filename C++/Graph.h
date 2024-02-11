@@ -68,9 +68,8 @@ public:
 
 template <class T>
 class Graph {
-protected:
-    std::unordered_map<T, std::shared_ptr<GraphNode<T>>> nodes {};
 public:
+    std::unordered_map<T, std::shared_ptr<GraphNode<T>>> nodes {};
     void createNode(T name) {
         if(nodes.contains(name)) {
             throw std::domain_error("Node already exists");
@@ -96,6 +95,7 @@ public:
  */
 template <class T>
 struct DijkstraIterationStep {
+public:
     std::shared_ptr<GraphNode<T>> current;
     double distance = HUGE_VAL;
     std::shared_ptr<GraphNode<T>> previous = nullptr;
@@ -109,13 +109,13 @@ struct DijkstraIterationStep {
 
 template <class T>
 class DijkstraTraversal {
-
+public:
     std::unordered_map<std::shared_ptr<GraphNode<T>>,
                         std::shared_ptr<DijkstraIterationStep<T>>> workingSet;
     std::shared_ptr<DijkstraIterationStep<T>> currentNode = nullptr;
 
     DijkstraTraversal(std::shared_ptr<Graph<T>> G, T start) {
-        if(!G.nodes.contains(start)) {
+        if(!G->nodes.contains(start)) {
             throw std::logic_error("Unable to find the node");
         }
         for(auto itr : G->nodes) {
@@ -129,12 +129,12 @@ class DijkstraTraversal {
         }
     }
 
-    DijkstraTraversal& begin() {
-        return &this;
+    DijkstraTraversal* begin() {
+        return this;
     }
 
-    DijkstraTraversal& end() {
-        return &this;
+    DijkstraTraversal* end() {
+        return this;
     }
 
 
@@ -174,12 +174,10 @@ class DijkstraTraversal {
         }
     }
 
-    void operator!=(DijkstraTraversal &other) {
+    bool operator!=(DijkstraTraversal &other) {
         assert(other == this);
         return currentNode == nullptr || workingSet.size() == 0;
     }
-
-
 };
 
 
