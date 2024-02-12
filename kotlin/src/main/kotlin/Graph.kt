@@ -12,8 +12,8 @@ class GraphEdgeError(message: String) : Exception(message)
  * node is designed to be an arbitrary type.
  */
 class GraphNode<T>(val name: T){
-    val outEdges: MutableSet<GraphEdge<T>> = mutableSetOf()
-    val inEdges: MutableSet<GraphEdge<T>> = mutableSetOf()
+    internal val outEdges: MutableSet<GraphEdge<T>> = mutableSetOf()
+    internal val inEdges: MutableSet<GraphEdge<T>> = mutableSetOf()
 
     /*
      * The first thing we do with our classes is make sure we
@@ -52,9 +52,8 @@ data class PathEntry<T>(
     var distance: Double,
     var priorNode: GraphNode<T>?) {
 
-
     /*
-     * We override the data class default toString so we have
+     * We override the data class default toString so that we have
      * something representative that makes sense and is good for testing.
      */
     override fun toString(): String {
@@ -75,7 +74,7 @@ class Graph<T>(){
      * of the node.  This allows us to easily find a particular node as the origin
      * of our shortest-path traversal
      */
-    val nodes: MutableMap<T, GraphNode<T>> = mutableMapOf<T, GraphNode<T>>()
+    internal val nodes: MutableMap<T, GraphNode<T>> = mutableMapOf<T, GraphNode<T>>()
 
     /*
      * Our iterator is over nodes.  This trick is to convert the Map iterator
@@ -126,6 +125,8 @@ class Graph<T>(){
      * they find a destination they intend to reach.
      */
     fun shortestPath(start: T): Sequence<PathEntry<T>> {
+
+        // This is the initialization step...
         val workingSet = mutableMapOf<GraphNode<T>, PathEntry<T>>()
         if(start !in nodes) {
             throw GraphKeyError("Need to specify a node in the graph")
@@ -146,26 +147,21 @@ class Graph<T>(){
                 var nextEntry: PathEntry<T>? = null
                 for ((_, entry) in workingSet) {
                     // If nextEntry is null, the comparison will always be with infinity so
-                    // we will take the new entry...
-                    nextEntry = if (entry.distance <= (nextEntry?.distance ?: Double.POSITIVE_INFINITY)) {
+                    // we will take the new entry but only if its less than infinity...
+                    nextEntry = if (entry.distance < (nextEntry?.distance ?: Double.POSITIVE_INFINITY)) {
                         entry
                     } else {
                         nextEntry
                     }
                 }
-                nextEntry as PathEntry<T>
+                if(nextEntry == null) return@sequence
+                // and because of the successful check, we now know that
+                // the node is not null so the compiler has changed the
+                // type to PathEntry<T>
                 workingSet.remove(nextEntry.node)
-                // If there are no more reachable nodes we will exit early.
-                if (nextEntry.distance == Double.POSITIVE_INFINITY) {
-                    return@sequence
-                }
+
                 // And now yield the result in the sequence
                 yield(nextEntry)
-
-                // This will now trigger if we want the next closest
-                // node.  This is an advantage of the Sequence structure:
-                // we are able to postpone these calculations until they are
-                // actually needed.
 
                 // So now we check each edge in current closest node...
                 for (edge in nextEntry.node.outEdges) {
