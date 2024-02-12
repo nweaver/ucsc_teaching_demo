@@ -4,72 +4,44 @@
 
 #ifndef GRAPH_H
 #define GRAPH_H
+#include <iostream>
 #include <map>
 #include <unordered_set>
 
+// C++ is somewhat obnoxious here:  You can't do a circular
+// reference, so we declare all the classes we will use all up here
+// and then declare the bodies later.
+
+// Additionally, since we are doing things with parameterized typing
+// on how we name the graph nodes, basically ALL the code needs to
+// be in the header, as C++'s parameterization is effectively textual
+// substitution: replacing the typename T with whatever type is actually
+// used in the code.
+
+// This code also requires C++20.  For some reason, C++'s standard container
+// classes (e.g. std::unordered_map) did not support a contains() boolean check
+// until C++20!
+
 template <class T> class GraphNode;
+template <class T> class GraphEdge;
+template <class T> class Graph;
+template <class T> struct DijkstraIterationStep;
+template <class T> class DijkstraTraversal;
+template <class T> struct DijkstraTraversalIterator;
 
-
-template <class T>
-class GraphEdge {
-public:
-    std::shared_ptr<GraphNode<T>> start;
-    std::shared_ptr<GraphNode<T>> end;
-    double weight;
-    GraphEdge(std::shared_ptr<GraphNode<T>> startIn,
-              std::shared_ptr<GraphNode<T>> endIn,
-        double weightIn) {
-        start = startIn;
-        end = endIn;
-        weight = weightIn;
-        for(auto itr: start->outEdges) {
-            if(itr->end == end) {
-                throw std::domain_error("Edge asready exists");
-            }
-        }
-    }
-};
-
-template <class T>
-class GraphNode {
-public:
-    T name;
-    std::unordered_set<std::shared_ptr<GraphEdge<T>>> outEdges {};
-    std::unordered_set<std::shared_ptr<GraphEdge<T>>> inEdges {};
-    explicit GraphNode(T nameIn) {
-        name = nameIn;
-    }
-
-    /*
-     * Note: This does NOT delete the node but also deletes the
-     * out edges.  This is needed for the C++ version
-     * but not the python or kotlin versions of the application.
-     *
-     * Because graphs contain cycles, the reference counting abilities
-     * of std::shared_ptr do not help here, instead we have to manually
-     * do this.
-     */
-    ~GraphNode() {
-        for(auto itr : outEdges) {
-            auto other = itr->end;
-            other->inEdges.erase(itr);
-        }
-        for(auto itr : inEdges) {
-            auto other = itr->start;
-            other->outEdges.erase(itr);
-        }
-        inEdges.clear();
-        outEdges.clear();
-    }
-};
-
-
-
-
+// The primary class for a Graph.
+//
+// This implementation uses an adjacency list within each node, and the graph
+// itself has a name->node mapping.
 template <class T>
 class Graph {
-public:
+private:
     std::unordered_map<T, std::shared_ptr<GraphNode<T>>> nodes {};
+    friend GraphEdge<T>;
+    friend GraphNode<T>;
+    friend DijkstraTraversalIterator<T>;
+
+public:
     void createNode(T name) {
         if(nodes.contains(name)) {
             throw std::domain_error("Node already exists");
@@ -86,12 +58,94 @@ public:
         nodes[start]->outEdges.insert(edge);
         nodes[end]->inEdges.insert(edge);
     }
+
+    // Note:  This doesn't DELETE the nodes and edges per se:
+    // Instead, it removes the LINKS between all the nodes and edges.
+    //
+    // C++ "smart" std::shared_ptr are not actually all that smart.  They
+    // are simply reference counts.  But because a graph has cycles, a
+    // reference counting collector can't actually remove the graph.
+    //
+    // So when the graph is deleted, we prune the internal connections
+    // so that the nodes CAN be cleaned up by the reference counter safely.
+    //
+    // This is especially important since the iterator itself returns
+    // structures with shared_ptr pointing to the nodes, so the node's lifetime
+    // can excee the lifetime of the enclosing graph.  IF we didn't use "smart"
+    // pointers for all the nodes/edges we could end up with use after
+    // free errors.
+    ~Graph() {
+        for (auto nodePair: nodes) {
+            auto node = nodePair.second;
+            for (auto itr: node->outEdges) {
+                auto other = itr->end;
+                other->inEdges.erase(itr);
+            }
+            for (auto itr: node->inEdges) {
+                auto other = itr->start;
+                other->outEdges.erase(itr);
+            }
+            node->inEdges.clear();
+            node->outEdges.clear();
+        }
+    }
 };
 
+
+
+// The class for the edge.  Its pretty simple, with
+// just a reference to the starting node, the ending node
+// and the weight on the edge.
+template <class T>
+class GraphEdge {
+
+public:
+    const double weight;
+    const std::shared_ptr<GraphNode<T>> start;
+    const std::shared_ptr<GraphNode<T>> end;
+
+    GraphEdge(std::shared_ptr<GraphNode<T>> startIn,
+              std::shared_ptr<GraphNode<T>> endIn,
+        double weightIn) : weight(weightIn), start(startIn), end(endIn) {
+
+        if(weight <= 0) {
+            throw std::domain_error("Weights must be positive");
+        }
+        for(auto itr: start->outEdges) {
+            if(itr->end == end) {
+                throw std::domain_error("Edge asready exists");
+            }
+        }
+    }
+};
+
+// And the class for the node.  This is an adjacency list approach, where
+// each node has an unordered set of outward edges and a corresponding unordered
+// set of inward edges.  For our traversal we are only using the outEdges, but
+// we include both to enable this class to support other graph operations.
+template <class T>
+class GraphNode {
+private:
+    std::unordered_set<std::shared_ptr<GraphEdge<T>>> outEdges {};
+    std::unordered_set<std::shared_ptr<GraphEdge<T>>> inEdges {};
+    friend DijkstraTraversalIterator<T>;
+    friend Graph<T>;
+    friend GraphEdge<T>;
+
+public:
+    const T name;
+
+    explicit GraphNode(T nameIn) : name(nameIn){
+    }
+
+};
+
+
 /*
- * Fortunately at least for this stuff we can use shared_ptr data
- * and reference counting, since there is no back-pointer from the
- * nodes to these values.
+ * This class is used to return step in the iteration:
+ * it contains a pointer to the node, the distance to this node from
+ * the start, and the prior node on the path (if this isn't the starting
+ * node).
  */
 template <class T>
 struct DijkstraIterationStep {
@@ -100,52 +154,79 @@ public:
     double distance = HUGE_VAL;
     std::shared_ptr<GraphNode<T>> previous = nullptr;
 
-    explicit DijkstraIterationStep(std::shared_ptr<GraphNode<T>> node) {
-        current = node;
+    explicit DijkstraIterationStep(std::shared_ptr<GraphNode<T>> node) : current(node) {
     }
 };
 
 
+// This is the heart of the calculation.  In C++ iterators are somewhat
+// complex:  the root object needs to support begin() and end() which return
+// the iteration objects themselves.  The iteration object for the beginning needs
+// to support ++ (increment), * (get the current element) and != (is it at the end).
+//
+// The end object is effectively a dummy in this case, but it needs to be supported
+// anyway.  It will create a needless empty map in the process, but ah well.
+//
+// Basically, in C++, a loop like
+
+// for(auto a : b) { ... }
+
+// gets converted into:
+
+// auto iterStart = b.begin()
+// auto iterEnd = b.end()
+// for(; iterStart != iterEnd; iterStart++) {
+//   auto a = *iterStart;
+//   ... }
+
+// This means that * will be called for each time through the loop
+// and ++ will be called just before the ending is checked.
 
 template <class T>
-class DijkstraTraversal {
-public:
+struct DijkstraTraversalIterator: std::input_iterator_tag {
+    friend DijkstraTraversal<T>;
+private:
     std::unordered_map<std::shared_ptr<GraphNode<T>>,
-                        std::shared_ptr<DijkstraIterationStep<T>>> workingSet;
+                    std::shared_ptr<DijkstraIterationStep<T>>> workingSet;
     std::shared_ptr<DijkstraIterationStep<T>> currentNode = nullptr;
+    const std::shared_ptr<Graph<T>> graph;
 
-    DijkstraTraversal(std::shared_ptr<Graph<T>> G, T start) {
-        if(!G->nodes.contains(start)) {
-            throw std::logic_error("Unable to find the node");
-        }
-        for(auto itr : G->nodes) {
-            auto element = std::make_shared<DijkstraIterationStep<T>>(itr.second);
-            if (itr.first == start) {
-                element->distance = 0;
-                currentNode = element;
-            } else {
+    // The private constructor for the iterator.  If its the end it does nothing.
+    // If it is the beginning it creates the working set and initializes all the
+    // distances to +infinity, except for the start which it initializes to zero.
+    //
+    // Once done it calls the intnernal iteration function once so that currentNode
+    // will be pointing to the first node in the traversal (which is the start node).
+    // and the first iteration of the calculation will be executed.
+    DijkstraTraversalIterator(std::shared_ptr<Graph<T>> graphPtr, T start, bool isBeginning) :
+    graph(graphPtr) {
+        if(isBeginning) {
+            if(!graph->nodes.contains(start)) {
+                throw std::logic_error("Unable to find the node");
+            }
+            for(auto itr : graph->nodes) {
+                auto element = std::make_shared<DijkstraIterationStep<T>>(itr.second);
+                if (itr.first == start) {
+                    element->distance = 0;
+                }
                 workingSet[itr.second] = element;
             }
+            this->iter();
         }
     }
 
-    DijkstraTraversal* begin() {
-        return this;
-    }
-
-    DijkstraTraversal* end() {
-        return this;
-    }
-
-
-    std::shared_ptr<DijkstraIterationStep<T>> operator*() {
-        return currentNode;
-    }
-
-
-    // The ++ operator is the part that does the
-    void operator++(){
-
+    // And this is the heart of the iteration step.  It clears the current node
+    // and first finds the closest node remaining in the working set which is the
+    // new current node (or returns if nothing to do).
+    //
+    // If the distance for the current node is still +infinity it sets the current to
+    // nullptr and returns.
+    //
+    // It removes that node from the working set and then for each outbound edge it looks
+    // up the destination.  If that destination is in the working set, it checks the
+    // distance.  If the new distance would be less it reduces the distance and updates
+    // the previous node on the record.
+    void iter() {
         currentNode = nullptr;
         if (workingSet.size() == 0) {
             return;
@@ -155,7 +236,7 @@ public:
                 currentNode = itr.second;
             }
             if(itr.second->distance < currentNode->distance) {
-                currentNode = itr;
+                currentNode = itr.second;
             }
         }
         workingSet.erase(currentNode->current);
@@ -164,21 +245,77 @@ public:
             return;
         }
         for (auto itr : currentNode->current->outEdges) {
-            if(workingSet.contains(itr.end)) {
+            if(workingSet.contains(itr->end)) {
                 auto distance = currentNode->distance + itr->weight;
-                if(distance < workingSet[itr->end].distance) {
-                    workingSet[itr->end].distance = distance;
-                    workingSet[itr->end].previous = currentNode;
+                if(distance < workingSet[itr->end]->distance) {
+                    workingSet[itr->end]->distance = distance;
+                    workingSet[itr->end]->previous = currentNode->current;
                 }
             }
         }
     }
 
-    bool operator!=(DijkstraTraversal &other) {
-        assert(other == this);
-        return currentNode == nullptr || workingSet.size() == 0;
+public:
+    // The ++ operator is the part that calls the iterator to
+    // make sure the current node is available.
+    void operator++() {
+        iter();
+    }
+
+    // And the * operator returns the current node.
+    std::shared_ptr<DijkstraIterationStep<T>> operator*() {
+        return currentNode;
+    }
+
+    // And this is "is there still data left".  The contract for the
+    // iterator says that ++ is called AFTER the data is accessed, so
+    // we know it will be executed in the loop in order: If there is
+    // no data left the != operation will be checked before the next call
+    // to *.
+    bool operator!=(DijkstraTraversalIterator &) {
+        return currentNode != nullptr;
     }
 };
+
+//
+// And this is the basic shell for the above iterator.
+// The constructor accepts the graph and the starting node,
+// while the object itself returns the iterator using begin()
+// and end().
+//
+// The reason why C++ requires returing TWO iterators, while
+// just about every other language with iteration primatives uses
+// one is because C++ bears a lot of old legacy.  Iterators were initially
+// designed to do things like iterate over an array's internal storage,
+// and the start and end were just pointers to the first element and one plus
+// the last element, and the ++ was just doing pointer arithmatic.
+template <class T>
+class DijkstraTraversal {
+
+public:
+    const std::shared_ptr<Graph<T>> graph;
+    const T start;
+    DijkstraTraversal(std::shared_ptr<Graph<T>> g, T s) : graph(g), start(s){
+    }
+
+    DijkstraTraversalIterator<T> begin() {
+        return DijkstraTraversalIterator<T>(graph, start, true);
+    }
+
+    DijkstraTraversalIterator<T> begin() const {
+        return DijkstraTraversalIterator<T>(graph, start, true);
+    }
+
+    DijkstraTraversalIterator<T> end() {
+        return DijkstraTraversalIterator<T>(graph, start, false);
+    }
+
+    DijkstraTraversalIterator<T> end() const {
+        return DijkstraTraversalIterator<T>(graph, start, false);
+    }
+};
+
+void testGraph();
 
 
 #endif //GRAPH_H
