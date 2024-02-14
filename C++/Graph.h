@@ -55,8 +55,8 @@ public:
         }
         auto edge = std::make_shared<GraphEdge<T>>(nodes[start], nodes[end],
             weight);
-        nodes[start]->outEdges.insert(edge);
-        nodes[end]->inEdges.insert(edge);
+        nodes[start]->out_edges.insert(edge);
+        nodes[end]->in_edges.insert(edge);
     }
 
     // Note:  This doesn't DELETE the nodes and edges per se:
@@ -77,16 +77,16 @@ public:
     ~Graph() {
         for (auto nodePair: nodes) {
             auto node = nodePair.second;
-            for (auto itr: node->outEdges) {
+            for (auto itr: node->out_edges) {
                 auto other = itr->end;
-                other->inEdges.erase(itr);
+                other->in_edges.erase(itr);
             }
-            for (auto itr: node->inEdges) {
+            for (auto itr: node->in_edges) {
                 auto other = itr->start;
-                other->outEdges.erase(itr);
+                other->out_edges.erase(itr);
             }
-            node->inEdges.clear();
-            node->outEdges.clear();
+            node->in_edges.clear();
+            node->out_edges.clear();
         }
     }
 };
@@ -111,7 +111,7 @@ public:
         if(weight <= 0) {
             throw std::domain_error("Weights must be positive");
         }
-        for(auto itr: start->outEdges) {
+        for(auto itr: start->out_edges) {
             if(itr->end == end) {
                 throw std::domain_error("Edge asready exists");
             }
@@ -126,8 +126,8 @@ public:
 template <class T>
 class GraphNode {
 private:
-    std::unordered_set<std::shared_ptr<GraphEdge<T>>> outEdges {};
-    std::unordered_set<std::shared_ptr<GraphEdge<T>>> inEdges {};
+    std::unordered_set<std::shared_ptr<GraphEdge<T>>> out_edges {};
+    std::unordered_set<std::shared_ptr<GraphEdge<T>>> in_edges {};
     friend DijkstraTraversalIterator<T>;
     friend Graph<T>;
     friend GraphEdge<T>;
@@ -172,12 +172,12 @@ public:
 // for(auto a : b) { ... }
 
 // gets converted into:
-
 // auto iterStart = b.begin()
 // auto iterEnd = b.end()
-// for(; iterStart != iterEnd; iterStart++) {
+// while(iterStart != iterEnd; ) {
 //   auto a = *iterStart;
-//   ... }
+//   ...
+//   iterStart++;}
 
 // This means that * will be called for each time through the loop
 // and ++ will be called just before the ending is checked.
@@ -187,20 +187,20 @@ struct DijkstraTraversalIterator: std::input_iterator_tag {
     friend DijkstraTraversal<T>;
 private:
     std::unordered_map<std::shared_ptr<GraphNode<T>>,
-                    std::shared_ptr<DijkstraIterationStep<T>>> workingSet;
-    std::shared_ptr<DijkstraIterationStep<T>> currentNode = nullptr;
+                    std::shared_ptr<DijkstraIterationStep<T>>> working_set;
+    std::shared_ptr<DijkstraIterationStep<T>> current_node = nullptr;
     const std::shared_ptr<Graph<T>> graph;
 
     // The private constructor for the iterator.  If its the end it does nothing.
     // If it is the beginning it creates the working set and initializes all the
     // distances to +infinity, except for the start which it initializes to zero.
     //
-    // Once done it calls the intnernal iteration function once so that currentNode
+    // Once done it calls the intnernal iteration function once so that current_node
     // will be pointing to the first node in the traversal (which is the start node).
     // and the first iteration of the calculation will be executed.
-    DijkstraTraversalIterator(std::shared_ptr<Graph<T>> graphPtr, T start, bool isBeginning) :
-    graph(graphPtr) {
-        if(isBeginning) {
+    DijkstraTraversalIterator(std::shared_ptr<Graph<T>> graph_ptr, T start, bool is_beginning) :
+    graph(graph_ptr) {
+        if(is_beginning) {
             if(!graph->nodes.contains(start)) {
                 throw std::logic_error("Unable to find the node");
             }
@@ -209,7 +209,7 @@ private:
                 if (itr.first == start) {
                     element->distance = 0;
                 }
-                workingSet[itr.second] = element;
+                working_set[itr.second] = element;
             }
             this->iter();
         }
@@ -227,29 +227,29 @@ private:
     // distance.  If the new distance would be less it reduces the distance and updates
     // the previous node on the record.
     void iter() {
-        currentNode = nullptr;
-        if (workingSet.size() == 0) {
+        current_node = nullptr;
+        if (working_set.size() == 0) {
             return;
         }
-        for (auto itr: workingSet) {
-            if(currentNode == nullptr) {
-                currentNode = itr.second;
+        for (auto itr: working_set) {
+            if(current_node == nullptr) {
+                current_node = itr.second;
             }
-            if(itr.second->distance < currentNode->distance) {
-                currentNode = itr.second;
+            if(itr.second->distance < current_node->distance) {
+                current_node = itr.second;
             }
         }
-        workingSet.erase(currentNode->current);
-        if(currentNode->distance == HUGE_VAL) {
-            currentNode = nullptr;
+        working_set.erase(current_node->current);
+        if(current_node->distance == HUGE_VAL) {
+            current_node = nullptr;
             return;
         }
-        for (auto itr : currentNode->current->outEdges) {
-            if(workingSet.contains(itr->end)) {
-                auto distance = currentNode->distance + itr->weight;
-                if(distance < workingSet[itr->end]->distance) {
-                    workingSet[itr->end]->distance = distance;
-                    workingSet[itr->end]->previous = currentNode->current;
+        for (auto itr : current_node->current->out_edges) {
+            if(working_set.contains(itr->end)) {
+                auto distance = current_node->distance + itr->weight;
+                if(distance < working_set[itr->end]->distance) {
+                    working_set[itr->end]->distance = distance;
+                    working_set[itr->end]->previous = current_node->current;
                 }
             }
         }
@@ -264,7 +264,7 @@ public:
 
     // And the * operator returns the current node.
     std::shared_ptr<DijkstraIterationStep<T>> operator*() {
-        return currentNode;
+        return current_node;
     }
 
     // And this is "is there still data left".  The contract for the
@@ -273,7 +273,7 @@ public:
     // no data left the != operation will be checked before the next call
     // to *.
     bool operator!=(DijkstraTraversalIterator &) {
-        return currentNode != nullptr;
+        return current_node != nullptr;
     }
 };
 
