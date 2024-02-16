@@ -17,4 +17,3 @@ The C++ version does not, as the C++ unit testing space is remarkably
 fragmented.  Instead there is a test function that is executable
 standalone, and could be integrated into a CTest suite.
 
-
