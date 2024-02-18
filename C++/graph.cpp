@@ -2,7 +2,7 @@
 // Created by Nicholas Weaver on 2/10/24.
 //
 
-#include "Graph.h"
+#include "graph.h"
 
 #include <cassert>
 #include <random>
@@ -24,17 +24,17 @@ void testGraph() {
     }
     auto rng = std::default_random_engine {};
     for (auto k = 0; k < 10; ++k) {
-        auto g = std::make_shared<Graph<int>>();
+        auto g = std::make_shared<graph<int>>();
         std::shuffle(std::begin(array), std::end(array), rng);
         for(i = 0; i < 10; ++i) {
-            g->createNode(array[i]);
+            g->create_node(array[i]);
         }
         std::shuffle(std::begin(array), std::end(array), rng);
         for(i = 0; i < 10; ++i) {
-            g->createLink(array[i], (array[i]+1) % 10, 1.0);
+            g->create_link(array[i], (array[i]+1) % 10, 1.0);
         }
         i = 0;
-        for(auto step : DijkstraTraversal<int>(g, 0)) {
+        for(auto step : dijkstra_traversal<int>(g, 0)) {
             assert(step->current->name == i);
             assert(step->distance == float(i));
             if(i != 0) {
@@ -47,12 +47,12 @@ void testGraph() {
         for(i = 0; i < 10; ++i) {
             for(auto j = 0; j < 10; ++j) {
                 if((i + 1) % 10 != j) {
-                    g->createLink(i,j,11);
+                    g->create_link(i,j,11);
                 }
             }
         }
         i = 0;
-        for(auto step : DijkstraTraversal<int>(g, 0)) {
+        for(auto step : dijkstra_traversal<int>(g, 0)) {
             assert(step->current->name == i);
             assert(step->distance == float(i));
             i++;

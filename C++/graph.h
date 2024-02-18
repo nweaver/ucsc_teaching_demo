@@ -22,38 +22,38 @@
 // classes (e.g. std::unordered_map) did not support a contains() boolean check
 // until C++20!
 
-template <class T> class GraphNode;
-template <class T> class GraphEdge;
-template <class T> class Graph;
-template <class T> struct DijkstraIterationStep;
-template <class T> class DijkstraTraversal;
-template <class T> struct DijkstraTraversalIterator;
+template <class T> class graph_node;
+template <class T> class graph_edge;
+template <class T> class graph;
+template <class T> struct dijkstra_iteration_step;
+template <class T> class dijkstra_traversal;
+template <class T> struct dijkstra_traversal_iterator;
 
 // The primary class for a Graph.
 //
 // This implementation uses an adjacency list within each node, and the graph
 // itself has a name->node mapping.
 template <class T>
-class Graph {
+class graph {
 private:
-    std::unordered_map<T, std::shared_ptr<GraphNode<T>>> nodes {};
-    friend GraphEdge<T>;
-    friend GraphNode<T>;
-    friend DijkstraTraversalIterator<T>;
+    std::unordered_map<T, std::shared_ptr<graph_node<T>>> nodes {};
+    friend graph_edge<T>;
+    friend graph_node<T>;
+    friend dijkstra_traversal_iterator<T>;
 
 public:
-    void createNode(T name) {
+    void create_node(T name) {
         if(nodes.contains(name)) {
             throw std::domain_error("Node already exists");
         }
-        nodes[name] = std::make_shared<GraphNode<T>>(name);
+        nodes[name] = std::make_shared<graph_node<T>>(name);
     }
 
-    void createLink(T start, T end, double weight) {
+    void create_link(T start, T end, double weight) {
         if(!nodes.contains(start) || !nodes.contains(end)) {
             throw std::domain_error("Node does not exist");
         }
-        auto edge = std::make_shared<GraphEdge<T>>(nodes[start], nodes[end],
+        auto edge = std::make_shared<graph_edge<T>>(nodes[start], nodes[end],
             weight);
         nodes[start]->out_edges.insert(edge);
         nodes[end]->in_edges.insert(edge);
@@ -74,9 +74,9 @@ public:
     // can excee the lifetime of the enclosing graph.  IF we didn't use "smart"
     // pointers for all the nodes/edges we could end up with use after
     // free errors.
-    ~Graph() {
-        for (auto nodePair: nodes) {
-            auto node = nodePair.second;
+    ~graph() {
+        for (auto node_pair: nodes) {
+            auto node = node_pair.second;
             for (auto itr: node->out_edges) {
                 auto other = itr->end;
                 other->in_edges.erase(itr);
@@ -97,15 +97,15 @@ public:
 // just a reference to the starting node, the ending node
 // and the weight on the edge.
 template <class T>
-class GraphEdge {
+class graph_edge {
 
 public:
     const double weight;
-    const std::shared_ptr<GraphNode<T>> start;
-    const std::shared_ptr<GraphNode<T>> end;
+    const std::shared_ptr<graph_node<T>> start;
+    const std::shared_ptr<graph_node<T>> end;
 
-    GraphEdge(std::shared_ptr<GraphNode<T>> startIn,
-              std::shared_ptr<GraphNode<T>> endIn,
+    graph_edge(std::shared_ptr<graph_node<T>> startIn,
+              std::shared_ptr<graph_node<T>> endIn,
         double weightIn) : weight(weightIn), start(startIn), end(endIn) {
 
         if(weight <= 0) {
@@ -124,18 +124,18 @@ public:
 // set of inward edges.  For our traversal we are only using the outEdges, but
 // we include both to enable this class to support other graph operations.
 template <class T>
-class GraphNode {
+class graph_node {
 private:
-    std::unordered_set<std::shared_ptr<GraphEdge<T>>> out_edges {};
-    std::unordered_set<std::shared_ptr<GraphEdge<T>>> in_edges {};
-    friend DijkstraTraversalIterator<T>;
-    friend Graph<T>;
-    friend GraphEdge<T>;
+    std::unordered_set<std::shared_ptr<graph_edge<T>>> out_edges {};
+    std::unordered_set<std::shared_ptr<graph_edge<T>>> in_edges {};
+    friend dijkstra_traversal_iterator<T>;
+    friend graph<T>;
+    friend graph_edge<T>;
 
 public:
     const T name;
 
-    explicit GraphNode(T nameIn) : name(nameIn){
+    explicit graph_node(T nameIn) : name(nameIn){
     }
 
 };
@@ -148,13 +148,13 @@ public:
  * node).
  */
 template <class T>
-struct DijkstraIterationStep {
+struct dijkstra_iteration_step {
 public:
-    std::shared_ptr<GraphNode<T>> current;
+    std::shared_ptr<graph_node<T>> current;
     double distance = HUGE_VAL;
-    std::shared_ptr<GraphNode<T>> previous = nullptr;
+    std::shared_ptr<graph_node<T>> previous = nullptr;
 
-    explicit DijkstraIterationStep(std::shared_ptr<GraphNode<T>> node) : current(node) {
+    explicit dijkstra_iteration_step(std::shared_ptr<graph_node<T>> node) : current(node) {
     }
 };
 
@@ -183,13 +183,13 @@ public:
 // and ++ will be called just before the ending is checked.
 
 template <class T>
-struct DijkstraTraversalIterator: std::input_iterator_tag {
-    friend DijkstraTraversal<T>;
+struct dijkstra_traversal_iterator: std::input_iterator_tag {
+    friend dijkstra_traversal<T>;
 private:
-    std::unordered_map<std::shared_ptr<GraphNode<T>>,
-                    std::shared_ptr<DijkstraIterationStep<T>>> working_set;
-    std::shared_ptr<DijkstraIterationStep<T>> current_node = nullptr;
-    const std::shared_ptr<Graph<T>> graph;
+    std::unordered_map<std::shared_ptr<graph_node<T>>,
+                    std::shared_ptr<dijkstra_iteration_step<T>>> working_set;
+    std::shared_ptr<dijkstra_iteration_step<T>> current_node = nullptr;
+    const std::shared_ptr<graph<T>> working_graph;
 
     // The private constructor for the iterator.  If its the end it does nothing.
     // If it is the beginning it creates the working set and initializes all the
@@ -198,14 +198,14 @@ private:
     // Once done it calls the intnernal iteration function once so that current_node
     // will be pointing to the first node in the traversal (which is the start node).
     // and the first iteration of the calculation will be executed.
-    DijkstraTraversalIterator(std::shared_ptr<Graph<T>> graph_ptr, T start, bool is_beginning) :
-    graph(graph_ptr) {
+    dijkstra_traversal_iterator(std::shared_ptr<graph<T>> graph_ptr, T start, bool is_beginning) :
+    working_graph(graph_ptr) {
         if(is_beginning) {
-            if(!graph->nodes.contains(start)) {
+            if(!working_graph->nodes.contains(start)) {
                 throw std::logic_error("Unable to find the node");
             }
-            for(auto itr : graph->nodes) {
-                auto element = std::make_shared<DijkstraIterationStep<T>>(itr.second);
+            for(auto itr : working_graph->nodes) {
+                auto element = std::make_shared<dijkstra_iteration_step<T>>(itr.second);
                 if (itr.first == start) {
                     element->distance = 0;
                 }
@@ -263,7 +263,7 @@ public:
     }
 
     // And the * operator returns the current node.
-    std::shared_ptr<DijkstraIterationStep<T>> operator*() {
+    std::shared_ptr<dijkstra_iteration_step<T>> operator*() {
         return current_node;
     }
 
@@ -272,7 +272,7 @@ public:
     // we know it will be executed in the loop in order: If there is
     // no data left the != operation will be checked before the next call
     // to *.
-    bool operator!=(DijkstraTraversalIterator &) {
+    bool operator!=(dijkstra_traversal_iterator &) {
         return current_node != nullptr;
     }
 };
@@ -290,28 +290,28 @@ public:
 // and the start and end were just pointers to the first element and one plus
 // the last element, and the ++ was just doing pointer arithmatic.
 template <class T>
-class DijkstraTraversal {
+class dijkstra_traversal {
 
 public:
-    const std::shared_ptr<Graph<T>> graph;
+    const std::shared_ptr<graph<T>> working_graph;
     const T start;
-    DijkstraTraversal(std::shared_ptr<Graph<T>> g, T s) : graph(g), start(s){
+    dijkstra_traversal(std::shared_ptr<graph<T>> g, T s) : working_graph(g), start(s){
     }
 
-    DijkstraTraversalIterator<T> begin() {
-        return DijkstraTraversalIterator<T>(graph, start, true);
+    dijkstra_traversal_iterator<T> begin() {
+        return dijkstra_traversal_iterator<T>(working_graph, start, true);
     }
 
-    DijkstraTraversalIterator<T> begin() const {
-        return DijkstraTraversalIterator<T>(graph, start, true);
+    dijkstra_traversal_iterator<T> begin() const {
+        return dijkstra_traversal_iterator<T>(working_graph, start, true);
     }
 
-    DijkstraTraversalIterator<T> end() {
-        return DijkstraTraversalIterator<T>(graph, start, false);
+    dijkstra_traversal_iterator<T> end() {
+        return dijkstra_traversal_iterator<T>(working_graph, start, false);
     }
 
-    DijkstraTraversalIterator<T> end() const {
-        return DijkstraTraversalIterator<T>(graph, start, false);
+    dijkstra_traversal_iterator<T> end() const {
+        return dijkstra_traversal_iterator<T>(working_graph, start, false);
     }
 };
 

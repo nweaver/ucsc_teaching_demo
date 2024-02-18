@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "Graph.h"
+#include "graph.h"
 
 int main() {
     testGraph();
