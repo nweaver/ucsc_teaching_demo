@@ -7,6 +7,10 @@
 #include <iostream>
 #include <map>
 #include <unordered_set>
+#include <unordered_map>
+#include <memory>
+#include <cmath>
+#include <algorithm>
 
 // C++ is somewhat obnoxious here:  You can't do a circular
 // reference, so we declare all the classes we will use all up here
