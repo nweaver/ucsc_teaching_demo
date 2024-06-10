@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/C__",
-            "args": [],
+            "args": ["fubar", "baz"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],
