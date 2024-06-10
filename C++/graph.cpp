@@ -2,9 +2,9 @@
 // Created by Nicholas Weaver on 2/10/24.
 //
 
-#include "graph.h"
+#include "graph.hpp"
 
-
+ 
 #include <cassert>
 #include <random>
 
@@ -16,7 +16,7 @@
 void testGraph() {
     std::cerr << "Initializing graph tests" << std::endl;
     auto array = std::vector<int>(10);
-    auto array2 = std::vector<int>(10);
+    auto array2 = std::vector<int>(10);  
 
     int i;
     for (i = 0; i < 10; ++i) {

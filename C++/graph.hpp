@@ -60,7 +60,7 @@ public:
         auto edge = std::make_shared<graph_edge<T>>(nodes[start], nodes[end],
             weight);
         nodes[start]->out_edges.insert(edge);
-        nodes[end]->in_edges.insert(edge);
+        nodes[end]->in_edges.insert(edge); 
     }
 
     // Note:  This doesn't DELETE the nodes and edges per se:
