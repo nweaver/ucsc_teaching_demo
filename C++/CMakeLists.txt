@@ -7,4 +7,4 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 
 add_executable(C__ main.cpp
         graph.cpp
-        graph.h)
+        graph.hpp)
