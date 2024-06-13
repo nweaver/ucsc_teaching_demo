@@ -111,7 +111,7 @@
 		},
 		{
 			"backtrace" : 1,
-			"path" : "graph.h",
+			"path" : "graph.hpp",
 			"sourceGroupIndex" : 1
 		}
 	],
