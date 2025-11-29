@@ -11,6 +11,7 @@
 #include <memory>
 #include <cmath>
 #include <algorithm>
+#include <assert.h>
 
 // C++ is somewhat obnoxious here:  You can't do a circular
 // reference, so we declare all the classes we will use all up here
@@ -82,11 +83,11 @@ public:
         for (auto node_pair: nodes) {
             auto node = node_pair.second;
             for (auto itr: node->out_edges) {
-                auto other = itr->end;
+                auto other = itr->end.lock();
                 other->in_edges.erase(itr);
             }
             for (auto itr: node->in_edges) {
-                auto other = itr->start;
+                auto other = itr->start.lock();
                 other->out_edges.erase(itr);
             }
             node->in_edges.clear();
@@ -105,8 +106,8 @@ class graph_edge {
 
 public:
     const double weight;
-    const std::shared_ptr<graph_node<T>> start;
-    const std::shared_ptr<graph_node<T>> end;
+    const std::weak_ptr<graph_node<T>> start;
+    const std::weak_ptr<graph_node<T>> end;
 
     graph_edge(std::shared_ptr<graph_node<T>> startIn,
               std::shared_ptr<graph_node<T>> endIn,
@@ -115,8 +116,8 @@ public:
         if(weight <= 0) {
             throw std::domain_error("Weights must be positive");
         }
-        for(auto itr: start->out_edges) {
-            if(itr->end == end) {
+        for(auto itr: start.lock()->out_edges) {
+            if(itr->end.lock() == end.lock()) {
                 throw std::domain_error("Edge asready exists");
             }
         }
@@ -249,11 +250,13 @@ private:
             return;
         }
         for (auto itr : current_node->current->out_edges) {
-            if(working_set.contains(itr->end)) {
+            auto end = itr->end.lock();
+            assert(end);
+            if(working_set.contains(end)) {
                 auto distance = current_node->distance + itr->weight;
-                if(distance < working_set[itr->end]->distance) {
-                    working_set[itr->end]->distance = distance;
-                    working_set[itr->end]->previous = current_node->current;
+                if(distance < working_set[end]->distance) {
+                    working_set[end]->distance = distance;
+                    working_set[end]->previous = current_node->current;
                 }
             }
         }

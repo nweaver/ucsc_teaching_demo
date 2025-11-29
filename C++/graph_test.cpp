@@ -3,10 +3,8 @@
 #include "graph.hpp"
 #include <random>
 
-// Demonstrate some basic assertions.
 TEST(GraphTest, BasicTest)
 {
-    EXPECT_TRUE(true);
     auto array = std::vector<int>(10);
     auto array2 = std::vector<int>(10);  
 
@@ -16,6 +14,10 @@ TEST(GraphTest, BasicTest)
         array2[i] = i;
     }
     auto rng = std::default_random_engine {};
+    // This test strategy is to create a path from 0-9 in a random order,
+    // with each node 1 from the next.  And then an additional set of links
+    // of size 11 (guarenteed not to be part of the traversal) are added as well.
+    // It then checks that the traversal starting at 0 is correct.
     for (auto k = 0; k < 10; ++k) {
         auto g = std::make_shared<graph<int>>();
         std::shuffle(std::begin(array), std::end(array), rng);
