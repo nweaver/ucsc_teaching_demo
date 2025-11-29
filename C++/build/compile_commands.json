@@ -1,14 +1,14 @@
 [
 {
-  "directory": "/home/vscode/ucsc_teaching_demo/C++/build",
-  "command": "/usr/bin/c++    -Wall -Wextra -g -std=gnu++20 -o CMakeFiles/C__.dir/main.cpp.o -c /home/vscode/ucsc_teaching_demo/C++/main.cpp",
-  "file": "/home/vscode/ucsc_teaching_demo/C++/main.cpp",
+  "directory": "/home/nweaver/ucsc_teaching_demo/C++/build",
+  "command": "/usr/bin/g++    -Wall -Wextra -g -std=gnu++20 -o CMakeFiles/C__.dir/main.cpp.o -c /home/nweaver/ucsc_teaching_demo/C++/main.cpp",
+  "file": "/home/nweaver/ucsc_teaching_demo/C++/main.cpp",
   "output": "CMakeFiles/C__.dir/main.cpp.o"
 },
 {
-  "directory": "/home/vscode/ucsc_teaching_demo/C++/build",
-  "command": "/usr/bin/c++    -Wall -Wextra -g -std=gnu++20 -o CMakeFiles/C__.dir/graph.cpp.o -c /home/vscode/ucsc_teaching_demo/C++/graph.cpp",
-  "file": "/home/vscode/ucsc_teaching_demo/C++/graph.cpp",
+  "directory": "/home/nweaver/ucsc_teaching_demo/C++/build",
+  "command": "/usr/bin/g++    -Wall -Wextra -g -std=gnu++20 -o CMakeFiles/C__.dir/graph.cpp.o -c /home/nweaver/ucsc_teaching_demo/C++/graph.cpp",
+  "file": "/home/nweaver/ucsc_teaching_demo/C++/graph.cpp",
   "output": "CMakeFiles/C__.dir/graph.cpp.o"
 }
 ]

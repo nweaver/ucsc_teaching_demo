@@ -8,8 +8,8 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/vscode/ucsc_teaching_demo/C++/graph.cpp" "CMakeFiles/C__.dir/graph.cpp.o" "gcc" "CMakeFiles/C__.dir/graph.cpp.o.d"
-  "/home/vscode/ucsc_teaching_demo/C++/main.cpp" "CMakeFiles/C__.dir/main.cpp.o" "gcc" "CMakeFiles/C__.dir/main.cpp.o.d"
+  "/home/nweaver/ucsc_teaching_demo/C++/graph.cpp" "CMakeFiles/C__.dir/graph.cpp.o" "gcc" "CMakeFiles/C__.dir/graph.cpp.o.d"
+  "/home/nweaver/ucsc_teaching_demo/C++/main.cpp" "CMakeFiles/C__.dir/main.cpp.o" "gcc" "CMakeFiles/C__.dir/main.cpp.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

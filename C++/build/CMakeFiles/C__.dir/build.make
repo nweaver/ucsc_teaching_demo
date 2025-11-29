@@ -53,10 +53,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/vscode/ucsc_teaching_demo/C++
+CMAKE_SOURCE_DIR = /home/nweaver/ucsc_teaching_demo/C++
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/vscode/ucsc_teaching_demo/C++/build
+CMAKE_BINARY_DIR = /home/nweaver/ucsc_teaching_demo/C++/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/C__.dir/depend.make
@@ -70,32 +70,32 @@ include CMakeFiles/C__.dir/progress.make
 include CMakeFiles/C__.dir/flags.make
 
 CMakeFiles/C__.dir/main.cpp.o: CMakeFiles/C__.dir/flags.make
-CMakeFiles/C__.dir/main.cpp.o: /home/vscode/ucsc_teaching_demo/C++/main.cpp
+CMakeFiles/C__.dir/main.cpp.o: /home/nweaver/ucsc_teaching_demo/C++/main.cpp
 CMakeFiles/C__.dir/main.cpp.o: CMakeFiles/C__.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/vscode/ucsc_teaching_demo/C++/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/C__.dir/main.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/C__.dir/main.cpp.o -MF CMakeFiles/C__.dir/main.cpp.o.d -o CMakeFiles/C__.dir/main.cpp.o -c /home/vscode/ucsc_teaching_demo/C++/main.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/nweaver/ucsc_teaching_demo/C++/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/C__.dir/main.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/C__.dir/main.cpp.o -MF CMakeFiles/C__.dir/main.cpp.o.d -o CMakeFiles/C__.dir/main.cpp.o -c /home/nweaver/ucsc_teaching_demo/C++/main.cpp
 
 CMakeFiles/C__.dir/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/C__.dir/main.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/vscode/ucsc_teaching_demo/C++/main.cpp > CMakeFiles/C__.dir/main.cpp.i
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nweaver/ucsc_teaching_demo/C++/main.cpp > CMakeFiles/C__.dir/main.cpp.i
 
 CMakeFiles/C__.dir/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/C__.dir/main.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/vscode/ucsc_teaching_demo/C++/main.cpp -o CMakeFiles/C__.dir/main.cpp.s
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nweaver/ucsc_teaching_demo/C++/main.cpp -o CMakeFiles/C__.dir/main.cpp.s
 
 CMakeFiles/C__.dir/graph.cpp.o: CMakeFiles/C__.dir/flags.make
-CMakeFiles/C__.dir/graph.cpp.o: /home/vscode/ucsc_teaching_demo/C++/graph.cpp
+CMakeFiles/C__.dir/graph.cpp.o: /home/nweaver/ucsc_teaching_demo/C++/graph.cpp
 CMakeFiles/C__.dir/graph.cpp.o: CMakeFiles/C__.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/vscode/ucsc_teaching_demo/C++/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/C__.dir/graph.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/C__.dir/graph.cpp.o -MF CMakeFiles/C__.dir/graph.cpp.o.d -o CMakeFiles/C__.dir/graph.cpp.o -c /home/vscode/ucsc_teaching_demo/C++/graph.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/nweaver/ucsc_teaching_demo/C++/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/C__.dir/graph.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/C__.dir/graph.cpp.o -MF CMakeFiles/C__.dir/graph.cpp.o.d -o CMakeFiles/C__.dir/graph.cpp.o -c /home/nweaver/ucsc_teaching_demo/C++/graph.cpp
 
 CMakeFiles/C__.dir/graph.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/C__.dir/graph.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/vscode/ucsc_teaching_demo/C++/graph.cpp > CMakeFiles/C__.dir/graph.cpp.i
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nweaver/ucsc_teaching_demo/C++/graph.cpp > CMakeFiles/C__.dir/graph.cpp.i
 
 CMakeFiles/C__.dir/graph.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/C__.dir/graph.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/vscode/ucsc_teaching_demo/C++/graph.cpp -o CMakeFiles/C__.dir/graph.cpp.s
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nweaver/ucsc_teaching_demo/C++/graph.cpp -o CMakeFiles/C__.dir/graph.cpp.s
 
 # Object files for target C__
 C___OBJECTS = \
@@ -109,7 +109,7 @@ C__: CMakeFiles/C__.dir/main.cpp.o
 C__: CMakeFiles/C__.dir/graph.cpp.o
 C__: CMakeFiles/C__.dir/build.make
 C__: CMakeFiles/C__.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/vscode/ucsc_teaching_demo/C++/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable C__"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/nweaver/ucsc_teaching_demo/C++/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable C__"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/C__.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -121,6 +121,6 @@ CMakeFiles/C__.dir/clean:
 .PHONY : CMakeFiles/C__.dir/clean
 
 CMakeFiles/C__.dir/depend:
-	cd /home/vscode/ucsc_teaching_demo/C++/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/vscode/ucsc_teaching_demo/C++ /home/vscode/ucsc_teaching_demo/C++ /home/vscode/ucsc_teaching_demo/C++/build /home/vscode/ucsc_teaching_demo/C++/build /home/vscode/ucsc_teaching_demo/C++/build/CMakeFiles/C__.dir/DependInfo.cmake "--color=$(COLOR)"
+	cd /home/nweaver/ucsc_teaching_demo/C++/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/nweaver/ucsc_teaching_demo/C++ /home/nweaver/ucsc_teaching_demo/C++ /home/nweaver/ucsc_teaching_demo/C++/build /home/nweaver/ucsc_teaching_demo/C++/build /home/nweaver/ucsc_teaching_demo/C++/build/CMakeFiles/C__.dir/DependInfo.cmake "--color=$(COLOR)"
 .PHONY : CMakeFiles/C__.dir/depend
 

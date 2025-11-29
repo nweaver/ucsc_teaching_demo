@@ -1,4 +1,4 @@
-# Install script for directory: /home/vscode/ucsc_teaching_demo/C++
+# Install script for directory: /home/nweaver/ucsc_teaching_demo/C++
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/vscode/ucsc_teaching_demo/C++/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/nweaver/ucsc_teaching_demo/C++/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

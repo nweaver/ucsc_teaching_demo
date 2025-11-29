@@ -1,1 +1,1 @@
-/usr/bin/c++  -Wall -Wextra -g CMakeFiles/C__.dir/main.cpp.o CMakeFiles/C__.dir/graph.cpp.o -o C__ 
+/usr/bin/g++  -Wall -Wextra -g CMakeFiles/C__.dir/main.cpp.o CMakeFiles/C__.dir/graph.cpp.o -o C__ 
