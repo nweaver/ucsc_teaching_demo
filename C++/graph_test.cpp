@@ -5,11 +5,12 @@
 
 TEST(GraphTest, BasicTest)
 {
-    auto array = std::vector<int>(10);
-    auto array2 = std::vector<int>(10);  
+    const int size = 50;
 
+    auto array = std::vector<int>(size);
+    auto array2 = std::vector<int>(size);  
     int i;
-    for (i = 0; i < 10; ++i) {
+    for (i = 0; i < size; ++i) {
         array[i] = i;
         array2[i] = i;
     }
@@ -21,12 +22,12 @@ TEST(GraphTest, BasicTest)
     for (auto k = 0; k < 10; ++k) {
         auto g = std::make_shared<graph<int>>();
         std::shuffle(std::begin(array), std::end(array), rng);
-        for(i = 0; i < 10; ++i) {
+        for(i = 0; i < size; ++i) {
             g->create_node(array[i]);
         }
         std::shuffle(std::begin(array), std::end(array), rng);
         for(i = 0; i < 10; ++i) {
-            g->create_link(array[i], (array[i]+1) % 10, 1.0);
+            g->create_link(array[i], (array[i]+1) % size, 1.0);
         }
         i = 0;
         for(auto step : dijkstra_traversal<int>(g, 0)) {
@@ -39,10 +40,10 @@ TEST(GraphTest, BasicTest)
             }
             i++;
         }
-        for(i = 0; i < 10; ++i) {
-            for(auto j = 0; j < 10; ++j) {
-                if((i + 1) % 10 != j) {
-                    g->create_link(i,j,11);
+        for(i = 0; i < size; ++i) {
+            for(auto j = 0; j < size; ++j) {
+                if((i + 1) % size != j) {
+                    g->create_link(i,j,size+2);
                 }
             }
         }
@@ -52,6 +53,7 @@ TEST(GraphTest, BasicTest)
             ASSERT_TRUE(step->distance == float(i));
             i++;
         }
+        ASSERT_TRUE(i == size);
         EXPECT_THROW(g->create_link(2, 3, 4), std::domain_error);
         EXPECT_THROW(g->create_link(2, 2, 4), std::domain_error);
     }
