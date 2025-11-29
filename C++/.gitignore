@@ -1,2 +1,7 @@
-# Ignore build
+# Ignore build 
+# CMake
+CMakeFiles
+CmakeCache.txt
+cmake_install.cmake
+C__
 build
