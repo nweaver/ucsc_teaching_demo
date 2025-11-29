@@ -1,3 +1,0 @@
-/home/nweaver/ucsc_teaching_demo/C++/build/CMakeFiles/C__.dir
-/home/nweaver/ucsc_teaching_demo/C++/build/CMakeFiles/edit_cache.dir
-/home/nweaver/ucsc_teaching_demo/C++/build/CMakeFiles/rebuild_cache.dir
