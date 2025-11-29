@@ -65,34 +65,11 @@ public:
     }
 
     // Note:  This doesn't DELETE the nodes and edges per se:
-    // Instead, it removes the LINKS between all the nodes and edges.
-    //
-    // C++ "smart" std::shared_ptr are not actually all that smart.  They
-    // are simply reference counts.  But because a graph has cycles, a
-    // reference counting collector can't actually remove the graph.
-    //
-    // So when the graph is deleted, we prune the internal connections
-    // so that the nodes CAN be cleaned up by the reference counter safely.
-    //
-    // This is especially important since the iterator itself returns
-    // structures with shared_ptr pointing to the nodes, so the node's lifetime
-    // can excee the lifetime of the enclosing graph.  IF we didn't use "smart"
-    // pointers for all the nodes/edges we could end up with use after
-    // free errors.
+    // Instead, the shared pointers to the nodes get decremented
+    // when the vectors get delected, and those can have their pointers
+    // to the edges decremented.
     ~graph() {
-        for (auto node_pair: nodes) {
-            auto node = node_pair.second;
-            for (auto itr: node->out_edges) {
-                auto other = itr->end.lock();
-                other->in_edges.erase(itr);
-            }
-            for (auto itr: node->in_edges) {
-                auto other = itr->start.lock();
-                other->out_edges.erase(itr);
-            }
-            node->in_edges.clear();
-            node->out_edges.clear();
-        }
+        
     }
 };
 
@@ -106,6 +83,10 @@ class graph_edge {
 
 public:
     const double weight;
+    // We have this be a weak pointer rather than a shared pointer:
+    // This means we don't create a cycle as edges don't create
+    // reference counting links to nodes, but nodes DO create
+    // refererce counting links to edges.
     const std::weak_ptr<graph_node<T>> start;
     const std::weak_ptr<graph_node<T>> end;
 

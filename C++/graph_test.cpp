@@ -52,5 +52,7 @@ TEST(GraphTest, BasicTest)
             ASSERT_TRUE(step->distance == float(i));
             i++;
         }
+        EXPECT_THROW(g->create_link(2, 3, 4), std::domain_error);
+        EXPECT_THROW(g->create_link(2, 2, 4), std::domain_error);
     }
 }
