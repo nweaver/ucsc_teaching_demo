@@ -13,6 +13,8 @@ class GraphNode():
         # We also maintain a set of backward edges from dest->source
         # so we can go backwards even though it is a directed graph.
         self.back_edges = set()
+
+        # Color is something for alternate applications
         self.color = "none-set"
         self.previous = None
         
@@ -20,7 +22,7 @@ class GraphNode():
         """Connects this node to another node.  Important notes: It
         assumes a DAG, and you need to connect the other way to be
         sure.  It also does NOT allow multiple connections to the same
-        destination, and enforces this with an assertion.
+        destination, and enforces this with an exception.
         """
         for e in self.edges:
             if e.dest_node == dest_node:
@@ -139,6 +141,8 @@ class Graph():
         return True
 
 
+    # This does the traversal as a lazy traversal using yield,
+    # so it can be used in a for loop.
     def dijkstra_traversal(self, node_name):
         start = self.nodes[node_name]
         unvisited = set()
@@ -173,7 +177,8 @@ class Graph():
             if self.nodes[n].color == "white":
                 return False
         return True
-            
+    
+    # This is just another traversal, breadth-first-earch
     def bfs_traversal(self, node_name):
         """Does an iterative breadth first search traversal"""
         for n in self.nodes:
@@ -195,7 +200,7 @@ class Graph():
 
 
     def dfs_iterative_traversal(self, node_name):
-        """Does an iterative breadth first search traversal"""
+        """Does an iterative depth first search traversal"""
         for n in self.nodes:
             self.nodes[n].color = "white"
             self.nodes[n].previous = None
