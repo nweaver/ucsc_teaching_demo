@@ -24,7 +24,7 @@
 // used in the code.
 
 // This code also requires C++20.  For some reason, C++'s standard container
-// classes (e.g. std::unordered_map and std::unordered_set) 
+// classes (e.g. std::unordered_map and std::unordered_set)
 // did not support a contains() boolean check until C++20!
 
 template <class T>
@@ -53,7 +53,6 @@ template <class T>
 class graph
 {
 private:
-
     // A mapping of name to node.  Since we use std::shared_ptr for the nodes,
     // when this graph is deallocated the nodes get their reference counts
     // decremented (and then deallocated)
@@ -103,7 +102,7 @@ class graph_edge
 
 public:
     const double weight;
-    
+
     // We have this be a weak pointer rather than a shared pointer:
     // This means we don't create a cycle as edges don't create
     // reference counting links to nodes, but nodes DO create
@@ -120,11 +119,16 @@ public:
         {
             throw std::domain_error("Weights must be positive");
         }
+        // For paranoia/soundness we check to make sure that an edge
+        // between two nodes doesn't already exist.
+
+        // Both start and end are weak-ptrs, so we have to call
+        // lock() before accessing which upgrades to a shared-ptr.
         for (auto itr : start.lock()->out_edges)
         {
             if (itr->end.lock() == end.lock())
             {
-                throw std::domain_error("Edge asready exists");
+                throw std::domain_error("Edge already exists");
             }
         }
     }
@@ -138,8 +142,11 @@ template <class T>
 class graph_node
 {
 private:
+    // Sets are nice for this, as they are only "key" data, which are
+    // shared_ptr to the edges.
     std::unordered_set<std::shared_ptr<graph_edge<T>>> out_edges{};
     std::unordered_set<std::shared_ptr<graph_edge<T>>> in_edges{};
+
     friend dijkstra_traversal_iterator<T>;
     friend graph<T>;
     friend graph_edge<T>;
@@ -153,7 +160,7 @@ public:
 };
 
 /*
- * This class is used to return step in the iteration:
+ * This class is used to return a step in the iteration:
  * it contains a pointer to the node, the distance to this node from
  * the start, and the prior node on the path (if this isn't the starting
  * node).
@@ -203,6 +210,7 @@ private:
     std::unordered_map<std::shared_ptr<graph_node<T>>,
                        std::shared_ptr<dijkstra_iteration_step<T>>>
         working_set;
+
     std::shared_ptr<dijkstra_iteration_step<T>> current_node = nullptr;
     const std::shared_ptr<graph<T>> working_graph;
 
@@ -213,7 +221,8 @@ private:
     // Once done it calls the intnernal iteration function once so that current_node
     // will be pointing to the first node in the traversal (which is the start node).
     // and the first iteration of the calculation will be executed.
-    dijkstra_traversal_iterator(std::shared_ptr<graph<T>> graph_ptr, T start, bool is_beginning) : working_graph(graph_ptr)
+    dijkstra_traversal_iterator(std::shared_ptr<graph<T>> graph_ptr,
+                                T start, bool is_beginning) : working_graph(graph_ptr)
     {
         if (is_beginning)
         {
@@ -269,6 +278,9 @@ private:
             current_node = nullptr;
             return;
         }
+
+        // And now update the distances to all the remaining nodes,
+        // if its less update the distance.
         for (auto itr : current_node->current->out_edges)
         {
             auto end = itr->end.lock();
