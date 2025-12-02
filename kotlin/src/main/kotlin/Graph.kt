@@ -57,7 +57,7 @@ data class PathEntry<T>(
      * something representative that makes sense and is good for testing.
      */
     override fun toString(): String {
-        return "$node.name/$distance($priorNode?.name)"
+        return "${node.name}/$distance(${priorNode?.name ?: "NONE"})"
     }
 }
 
