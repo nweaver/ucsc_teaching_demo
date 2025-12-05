@@ -32,11 +32,15 @@ TEST(GraphTest, BasicTest)
         {
             g->create_node(array[i]);
         }
+        g->create_node(-1);
         std::shuffle(std::begin(array), std::end(array), rng);
         for (i = 0; i < size; ++i)
         {
             g->create_link(array[i], (array[i] + 1) % size, 1.0);
         }
+        // And create a link from node -1 into the graph but
+        // there is nothing out from it so we should never follow this.
+        g->create_link(-1, 0, 1.0);
 
         // Check to make sure the correctness assertions on insertion
         // (node must be in the graph and weights must be positive)

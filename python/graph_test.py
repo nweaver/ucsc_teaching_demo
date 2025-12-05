@@ -102,6 +102,8 @@ class TestGraphMethods(unittest.TestCase):
             g[i] = i
         for i in range(0, 10):
             g.connect(i,(i+1)%10, 1)
+        g[-1] = -1
+        g.connect(-1, 0, 1)
         i = 0;
         for item in g.dijkstra_traversal(0):
             self.assertTrue(item.name == i)
