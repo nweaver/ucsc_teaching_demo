@@ -8,6 +8,7 @@ class GraphTest {
     @Test
     fun shortestPath() {
 
+        print("Launching test suite\n")
         // The first test is a simple one: A 4 entry graph, all connected by
         // single weight 1 links to the start.
         val graph = makeGraphNodes<String>("A", "B", "C", "D")
@@ -20,6 +21,7 @@ class GraphTest {
                 assert(distance == 0.0)
             } else {
                 assert(distance == 1.0)
+                assert(previous!!.name == "A")
             }
         }
         // And there should be 4 entries returned...
@@ -27,6 +29,7 @@ class GraphTest {
 
         // Now we test a disconnected node...
         graph.insertNode("E")
+        graph.insertEdge("E", "A", 1.0)
         // We shouldn't have E in it...
         assert(!graph.shortestPath("A").any{it.node.name == "E"})
         assert(graph.shortestPath("A").count() == 4)
